@@ -1,5 +1,5 @@
 from nicegui import ui
-
+from Mode import Mode
 deck = [
     {'front': 'Hello', 'back': 'Xin chào'},
     {'front': 'Thank you', 'back': 'Cảm ơn'},
@@ -8,10 +8,9 @@ deck = [
 
 @ui.page('/Decks')
 def flashcard_list_page():
+    Mode()
     selected_index = {'value': None}
-    card_info_text = ui.label('Card Info Here').classes('text-lg q-mt-md text-center')
 
-    list_view = ui.column().classes('q-pa-md bg-white rounded shadow-md max-h-64 overflow-auto w-full')
 
     # Dialog thêm
     add_card_dialog = ui.dialog()
@@ -108,14 +107,14 @@ def flashcard_list_page():
     with ui.column().classes('items-center justify-center min-h-screen q-gutter-md max-w-xl mx-auto'):
         ui.label('📘 My Decks').classes('text-h4 text-center')
 
-        list_view
-
+        
         with ui.row().classes('q-mt-md justify-center'):
             ui.button('➕ Add', on_click=add_card).props('color=primary')
             ui.button('✏️ Edit', on_click=edit_card).props('color=secondary')
             ui.button('❌ Delete', on_click=delete_card).props('color=negative')
+        list_view = ui.column().classes('q-pa-md bg-white rounded shadow-md max-h-64 overflow-auto w-full')
 
-        card_info_text
+        card_info_text = ui.label('Card Info Here').classes('text-lg q-mt-md text-center')
 
         with ui.row().classes('q-mt-md justify-center'):
             ui.button('Front', on_click=show_card_front).props('color=primary')
