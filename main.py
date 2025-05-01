@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from nicegui import app as nicegui_app, ui, html
 from Pages.Login_page import Login_page
 from Pages.Home_page import Home_page
+
 from fastapi import Request
 from fastapi.responses import RedirectResponse
 from starlette.middleware.base import BaseHTTPMiddleware
