@@ -37,12 +37,12 @@ nicegui_app.add_middleware(AuthMiddleware)
 
 
 @ui.page("/login")
-def login():
+async def login():
     Login_page()
 
 
 @ui.page("/home")
-def home():
+async def home():
     Home_page()
 
 

@@ -10,6 +10,7 @@ from ProtectedData import getLLM_APIkey
 # print(response.text)
 def FreePrompt(Prompt):
     client = genai.Client(api_key=getLLM_APIkey())
+    print("Running Prompt---------")
     response = client.models.generate_content(
         model="gemini-2.0-flash",
         contents=Prompt,

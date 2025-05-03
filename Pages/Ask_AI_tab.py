@@ -1,9 +1,9 @@
-from nicegui import app as nicegui_app, ui
+from nicegui import app as nicegui_app, ui, run
 from LLM_API import FreePrompt
 
 
-def UpdateAI_Answer(AI_Answer, Prompt):
-    AI_Answer.text = FreePrompt(Prompt)
+async def UpdateAI_Answer(AI_Answer, Prompt):
+    AI_Answer.text = await run.io_bound(FreePrompt, Prompt)
 
 
 def Ask_AI_tab():
@@ -19,7 +19,10 @@ def Ask_AI_tab():
     #     "keydown.enter",
     #     lambda: UpdateAI_Answer(AI_Answer, UserPrompt.value),
     # )  # .classes("items-center")
-    ui.button("Ask AI", on_click=lambda: UpdateAI_Answer(AI_Answer, UserPrompt.value))
+    ui.button(
+        "Ask AI",
+        on_click=lambda: UpdateAI_Answer(AI_Answer, UserPrompt.value),
+    )
     ui.separator()
     AI_Answer = ui.label("AI's answer").style(
         "white-space: pre-wrap;"
