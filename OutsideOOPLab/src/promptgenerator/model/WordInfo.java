@@ -22,8 +22,7 @@ public class WordInfo {
     			+ "\nWord Types:\n";
     	int i = 1;
     	for (String wordType : wordTypes) {
-    		result = result + i + ". " + wordType + '\n';
-    		i++;
+    		result = result + (i++) + ". " + wordType + '\n';
     	}
     	return result;
     }

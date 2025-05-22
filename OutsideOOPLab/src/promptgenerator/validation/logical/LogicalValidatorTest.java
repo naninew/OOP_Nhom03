@@ -25,7 +25,7 @@ public class LogicalValidatorTest {
         wordTypes.add("verb");
 
         WordInfo word1 = new WordInfo(
-                "", "English", "CEFR A2", wordTypes);
+                "", "", "CEFR A2", wordTypes);
 
         WordInfo word2 = new WordInfo(
                 "勉強", "", "JLPT N5", wordTypes);

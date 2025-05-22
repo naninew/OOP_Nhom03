@@ -20,8 +20,7 @@ public class ChineseCharacterInfo {
     			+ "\nRadicals: \n";
     	int i = 1;
     	for (String radical : radicals) {
-    		result = result + i + ". " + radical + '\n';
-    		i++;
+    		result = result + (i++) + ". " + radical + '\n';
     	}
     	return result;
     }

@@ -31,12 +31,12 @@ public class ValidationResult {
     	String result = "Errors:\n";
     	int i = 1;
     	for (String error : errors) {
-    		result += (i + ". " + error + "\n");
+    		result += ((i++) + ". " + error + "\n");
     	}
     	i = 1;
     	result += "Hints:\n";
     	for (String hint : hints) {
-    		result += (i + ". " + hint + "\n");
+    		result += ((i++) + ". " + hint + "\n");
     	}
     	return result;
     }
