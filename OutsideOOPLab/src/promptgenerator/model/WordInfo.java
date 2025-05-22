@@ -14,6 +14,19 @@ public class WordInfo {
     	}
     	return false;
     }
+    
+    public String toText() {
+    	String result = "Word: " + word
+    			+ "\nLanguage: " + language
+    			+ "\nWord Level: " + wordLevel
+    			+ "\nWord Types:\n";
+    	int i = 0;
+    	for (String wordType : wordTypes) {
+    		result = result + (i + 1) + ". " + wordType + '\n';
+    		i++;
+    	}
+    	return result;
+    }
 
 	public WordInfo(String word, String language, String wordLevel, List<String> wordTypes) {
 		super();

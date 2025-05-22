@@ -19,10 +19,7 @@ public class PromptValidator {
         		LogicalValidator<ChineseCharacterInfo> characterValidator = new CharacterInfoValidator();
                 result.merge(characterValidator.validate((ChineseCharacterInfo)context.getInput()));
         	}
-        	else if (context.getInput() instanceof RadicalInfo) {
-        		LogicalValidator<RadicalInfo> radicalValidator = new RadicalInfoValidator();
-                result.merge(radicalValidator.validate((RadicalInfo)context.getInput()));
-        	}
+        	// add more as needed
         }
         // 2. Semantic hints (as prompt modules)
         if (context.isIncludeValidationHints()) {

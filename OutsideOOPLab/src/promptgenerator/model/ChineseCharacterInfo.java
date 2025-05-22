@@ -1,9 +1,11 @@
 package promptgenerator.model;
 
+import java.util.List;
+
 public class ChineseCharacterInfo {
 	private String character;
     private String characterLevel;
-    private RadicalInfo radicals;
+    private List<String> radicals;
     
     public boolean isEmpty() {
     	if (character == null || character.trim().isEmpty()) {
@@ -11,8 +13,20 @@ public class ChineseCharacterInfo {
     	}
     	return false;
     }
+    
+    public String toText() {
+    	String result = "Character: " + character
+    			+ "\nCharacter Level: " + characterLevel
+    			+ "\nRadicals: \n";
+    	int i = 0;
+    	for (String radical : radicals) {
+    		result = result + (i + 1) + ". " + radical + '\n';
+    		i++;
+    	}
+    	return result;
+    }
 
-	public ChineseCharacterInfo(String character, String characterLevel, RadicalInfo radicals) {
+	public ChineseCharacterInfo(String character, String characterLevel, List<String> radicals) {
 		super();
 		this.character = character;
 		this.characterLevel = characterLevel;
@@ -35,11 +49,11 @@ public class ChineseCharacterInfo {
 		this.characterLevel = characterLevel;
 	}
 
-	public RadicalInfo getRadicals() {
+	public List<String> getRadicals() {
 		return radicals;
 	}
 
-	public void setRadicals(RadicalInfo radicals) {
+	public void setRadicals(List<String> radicals) {
 		this.radicals = radicals;
 	}
 }

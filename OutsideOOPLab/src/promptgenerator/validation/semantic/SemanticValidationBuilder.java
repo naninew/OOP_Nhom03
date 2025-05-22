@@ -13,9 +13,7 @@ public class SemanticValidationBuilder {
             return new WordInfoHintsGenerator(context).validate((WordInfo) input);
         } else if (input instanceof ChineseCharacterInfo) {
             return new CharacterInfoHintsGenerator(context).validate((ChineseCharacterInfo) input);
-        } else if (input instanceof RadicalInfo) {
-            return new RadicalInfoHintsGenerator(context).validate((RadicalInfo) input);
-        } 
+        }
         // Add more as needed later
         else {
             return new ValidationResult(); // empty
