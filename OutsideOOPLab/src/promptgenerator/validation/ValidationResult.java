@@ -26,6 +26,20 @@ public class ValidationResult {
     public List<String> getHints() {
         return hints;
     }
+    
+    public String toText() {
+    	String result = "Errors:\n";
+    	int i = 1;
+    	for (String error : errors) {
+    		result += (i + ". " + error + "\n");
+    	}
+    	i = 1;
+    	result += "Hints:\n";
+    	for (String hint : hints) {
+    		result += (i + ". " + hint + "\n");
+    	}
+    	return result;
+    }
 
     public boolean hasErrors() {
         return !errors.isEmpty();
@@ -42,6 +56,6 @@ public class ValidationResult {
 	
 	public ValidationResult() {
 		super();
-		this.errors = null;
+		this.errors = new ArrayList<>();
 	}
 }

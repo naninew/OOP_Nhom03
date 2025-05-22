@@ -18,9 +18,9 @@ public class ChineseCharacterInfo {
     	String result = "Character: " + character
     			+ "\nCharacter Level: " + characterLevel
     			+ "\nRadicals: \n";
-    	int i = 0;
+    	int i = 1;
     	for (String radical : radicals) {
-    		result = result + (i + 1) + ". " + radical + '\n';
+    		result = result + i + ". " + radical + '\n';
     		i++;
     	}
     	return result;

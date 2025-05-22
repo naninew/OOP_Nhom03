@@ -20,9 +20,9 @@ public class WordInfo {
     			+ "\nLanguage: " + language
     			+ "\nWord Level: " + wordLevel
     			+ "\nWord Types:\n";
-    	int i = 0;
+    	int i = 1;
     	for (String wordType : wordTypes) {
-    		result = result + (i + 1) + ". " + wordType + '\n';
+    		result = result + i + ". " + wordType + '\n';
     		i++;
     	}
     	return result;
