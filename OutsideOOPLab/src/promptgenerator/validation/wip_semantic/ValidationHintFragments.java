@@ -1,4 +1,4 @@
-package promptgenerator.validation.semantic;
+package promptgenerator.validation.wip_semantic;
 
 public class ValidationHintFragments {
 

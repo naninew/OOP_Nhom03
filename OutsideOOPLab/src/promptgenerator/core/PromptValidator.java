@@ -3,7 +3,7 @@ package promptgenerator.core;
 import promptgenerator.model.*;
 import promptgenerator.validation.ValidationResult;
 import promptgenerator.validation.logical.*;
-import promptgenerator.validation.semantic.*;
+import promptgenerator.validation.wip_semantic.*;
 
 public class PromptValidator {
     public ValidationResult validate(PromptContext context) {

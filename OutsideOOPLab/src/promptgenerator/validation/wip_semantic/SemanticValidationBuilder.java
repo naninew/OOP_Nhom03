@@ -1,4 +1,4 @@
-package promptgenerator.validation.semantic;
+package promptgenerator.validation.wip_semantic;
 
 import promptgenerator.core.*;
 import promptgenerator.model.*;
