@@ -58,28 +58,28 @@ Expression
 }
 
 
-def get_UserPassword(email: str):
+def get_UserPassword_Fake(email: str):
     return Fake_UserEmailPass.get(email, None)
 
 
-def get_UserId(email: str):
+def get_UserId_Fake(email: str):
     return Fake_UserEmailID.get(email, None)
 
 
-def get_DeckIdList(userId: str):
+def get_DeckIdList_Fake(userId: str):
     return Fake_DeckIdList.get(userId, None)
 
 
-def get_CardIdList(deckId: str):
+def get_CardIdList_Fake(deckId: str):
     return Fake_CardIdList.get(deckId, None)
 
 
-def get_DeckDetail(deckId: str):
+def get_DeckDetail_Fake(deckId: str):
 
     return Fake_DeckDetail.get(deckId, None)
 
 
-def get_CardDetail(cardId: str):
+def get_CardDetail_Fake(cardId: str):
     return Fake_CardDetail.get(cardId, None)
 
 
@@ -98,3 +98,129 @@ def set_CardDetail(cardID: str, Front: str, Back: str):
     if cardID in Fake_CardDetail:
         Fake_CardDetail[cardID]["Front"] = Front
         Fake_CardDetail[cardID]["Back"] = Back
+
+
+# -----------------------------------------------------------------------------------------------
+# from mysqlx import Row
+import psycopg2
+import ProtectedData
+
+
+def RunQuery(query: str):
+    DB_info = ProtectedData.getDatabaseKey()
+    conn = psycopg2.connect(
+        database=DB_info["DB_NAME"],
+        password=DB_info["DB_PASS"],
+        user=DB_info["DB_USER"],
+        host=DB_info["DB_HOST"],
+        port=DB_info["DB_PORT"],
+    )
+    print("Connected successfully")
+    cur = conn.cursor()
+    cur.execute(query)
+    rows = cur.fetchall()
+    print(rows)
+    # for data in rows:
+    #     print(data)
+    #     print("\n----------------\n")
+    conn.close()
+    return rows
+
+
+def get_UserPassword(email: str):
+    rows = RunQuery(
+        """SELECT password 
+            FROM user_account 
+            WHERE email='{}'""".format(
+            email
+        )
+    )
+    if len(rows) == 0:
+        return None
+    return rows[0][0]
+
+
+def get_UserId(email: str):
+    rows = RunQuery(
+        """SELECT user_id 
+            FROM user_account 
+            WHERE email='{}'""".format(
+            email
+        )
+    )
+    if len(rows) == 0:
+        return None
+    return rows[0][0]
+
+
+def get_AuthorName(userId: str):
+    rows = RunQuery(
+        """SELECT user_name 
+            FROM user_account 
+            WHERE user_id='{}'""".format(
+            userId
+        )
+    )
+    if len(rows) == 0:
+        return "Unknown author"
+    return rows[0][0]
+
+
+def get_DeckIdList(userId: str):
+    rows = RunQuery(
+        """SELECT deck_id 
+            FROM deck 
+            WHERE author_id='{}' OR public=true""".format(
+            userId
+        )
+    )
+    if len(rows) == 0:
+        return None
+    return list(i[0] for i in rows)
+
+
+def get_CardIdList(deckId: str):
+    rows = RunQuery(
+        """SELECT card_id      
+        FROM card 
+        WHERE deck_id='{}'""".format(
+            deckId
+        )
+    )
+    if len(rows) == 0:
+        return None
+    return list(i[0] for i in rows)
+
+
+def get_DeckDetail(deckId: str):
+    rows = RunQuery(
+        """SELECT deck_name,author_id,public,back_lang 
+            FROM deck 
+            WHERE deck_id='{}'""".format(
+            deckId
+        )
+    )
+    if len(rows) == 0:
+        return None
+    Output = dict()
+    Output["BackLanguage"] = rows[0][3]
+    Output["Title"] = rows[0][0]
+    Output["ViewType"] = "public" if rows[0][2] else "private"
+    Output["Author"] = get_AuthorName(rows[0][1])
+    return Output
+
+
+def get_CardDetail(cardId: str):
+    rows = RunQuery(
+        """SELECT front,back 
+            FROM card
+            WHERE card_id='{}'""".format(
+            cardId
+        )
+    )
+    if len(rows) == 0:
+        return None
+    Output = dict()
+    Output["Front"] = rows[0][0]
+    Output["Back"] = rows[0][1]
+    return Output

@@ -17,6 +17,7 @@ def DeckCard(deckId, tabs, CurrentDeckId):
             ui.label("Title: {}".format(DeckDetail["Title"]))
             ui.label("Back language: {}".format(DeckDetail["BackLanguage"]))
             ui.label("View type: {}".format(DeckDetail["ViewType"]))
+            ui.label("Author: {}".format(DeckDetail["Author"]))
             ui.button(
                 "Use this deck",
                 on_click=lambda: UseThisDeck(deckId, tabs, CurrentDeckId),
