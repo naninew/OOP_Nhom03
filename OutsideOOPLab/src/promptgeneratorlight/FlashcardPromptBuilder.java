@@ -1,11 +1,11 @@
-package promptgenerator;
+package promptgeneratorlight;
 
 public class FlashcardPromptBuilder {
 	private static boolean isInvalid(String str) {
         return str == null || str.trim().isEmpty();
     }
 
-    public static String buildPrompt(String topic, String term, String responseLanguage, String userLanguage) {
+    public static String buildPrompt(String topic, String term, String responseLanguage) {
         if (isInvalid(topic)) {
             System.out.println("Topic must not be null, empty, or blank.");
         } // suppose this doesn't happen, and according to the database, 
