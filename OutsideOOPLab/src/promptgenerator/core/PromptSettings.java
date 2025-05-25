@@ -3,18 +3,9 @@ package promptgenerator.core;
 import java.util.*;
 
 public class PromptSettings {
-    private boolean simplifyExamples;
     private boolean conciseMode;  // e.g., for flashcard back side
     private int characterLimit = 300;   // max characters in output
-    private boolean includeValidationHints;
-    private boolean allowPartialInput;
-	public boolean isSimplifyExamples() {
-		return simplifyExamples;
-	}
-	
-	public void setSimplifyExamples(boolean simplifyExamples) {
-		this.simplifyExamples = simplifyExamples;
-	}
+    private boolean includeValidationHints = false;
 	
 	public boolean isConciseMode() {
 		return conciseMode;
@@ -34,17 +25,5 @@ public class PromptSettings {
 	
 	public boolean isIncludeValidationHints() {
 		return includeValidationHints;
-	}
-	
-	public void setIncludeValidationHints(boolean includeValidationHints) {
-		this.includeValidationHints = includeValidationHints;
-	}
-	
-	public boolean isAllowPartialInput() {
-		return allowPartialInput;
-	}
-	
-	public void setAllowPartialInput(boolean allowPartialInput) {
-		this.allowPartialInput = allowPartialInput;
 	}
 }
