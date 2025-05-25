@@ -5,18 +5,14 @@ public class FlashcardPromptBuilder {
         return str == null || str.trim().isEmpty();
     }
 
-    public static String buildPrompt(String topic, String term, String responseLanguage) {
+    public static String buildPrompt(String topic, String term, String responseLanguage, String userLanguage) {
         if (isInvalid(topic)) {
-            throw new IllegalArgumentException("Topic must not be null, empty, or blank.");
-        }
-        if (isInvalid(term)) {
-            throw new IllegalArgumentException("Term must not be null, empty, or blank.");
-        }
-        if (isInvalid(responseLanguage)) {
-            throw new IllegalArgumentException("Response language must not be null, empty, or blank.");
-        }
+            System.out.println("Topic must not be null, empty, or blank.");
+        } // suppose this doesn't happen, and according to the database, 
+          // responseLanguage and term cannot be null, so we do not need
+          // to work on handling them.
 
-        return String.format(
+        String result = String.format(
             "Provided that I am a learner of %s dealing with flashcards. " +
             "I want to write a flashcard's back face from its front face, %s. " +
             "Give me detailed information about anything I need to learn about %s, " +
@@ -25,5 +21,7 @@ public class FlashcardPromptBuilder {
             "so please do not start or end with any irrelevant sentences.",
             topic.trim(), term.trim(), term.trim(), responseLanguage.trim()
         );
+        
+        return result;
     }
 }
