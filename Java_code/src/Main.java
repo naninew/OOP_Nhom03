@@ -1,3 +1,4 @@
+import LLM_Prompt.BackFlashcardPrompt;
 import Query_Builder.*;
 import Query_Builder.Card;
 import Query_Builder.Deck;
@@ -14,9 +15,10 @@ public class Main {
     Condition condition=new Condition("");
     Operator operator=new Operator("");
     String placeholder="{}";
+    BackFlashcardPrompt backFlashcardPrompt=new BackFlashcardPrompt("");
 
-    public String SayHello(){
-        return "This String is from Java";
+    public String SayHello(String name){
+        return "This String is from Java"+". Hello "+name;
     }
     public String get_UserPassword(){
         return query.select(user_account.password)
@@ -140,56 +142,3 @@ public class Main {
 }
 
 
-//        System.out.println("- - - - - - - - - - - - - - - - - - -");
-//        System.out.println(card.updateRow());
-//        System.out.println("- - - - - - - - - - - - - - - - - - -");
-//        System.out.println(card_tag.updateRow());
-//        QueryService QS=new QueryService();
-//        System.out.println("- - - - - - - - - - - - - - - - - - -");
-//        System.out.println(QS.getUserAccountUserNameQuery());
-//        System.out.println("- - - - - - - - - - - - - - - - - - -");
-//        System.out.println(QS.getCardBasicInfoByIdQuery());
-//        System.out.println("- - - - - - - - - - - - - - - - - - -");
-//        System.out.println(QS.getCardAllCardsByUserThroughDeckQuery());
-//        System.out.println("- - - - - - - - - - - - - - - - - - -");
-//        System.out.println(QS.getDeckBasicInfoByIdQuery());
-//        System.out.println("- - - - - - - - - - - - - - - - - - -");
-//        System.out.println(QS.getCardCardIdsByDeckIdQuery());
-//        System.out.println("- - - - - - - - - - - - - - - - - - -");
-//        System.out.println(QS.getCardCountCardsInDeckQuery());
-//        System.out.println("- - - - - - - - - - - - - - - - - - -");
-//        System.out.println(QS.getCardQueryGeneratorInstance());
-//        System.out.println("- - - - - - - - - - - - - - - - - - -");
-//        System.out.println(QS.getDeckAvailableDeckIdsForUserQuery());
-//        System.out.println("- - - - - - - - - - - - - - - - - - -");
-//        System.out.println(QS.getDeckDecksByAuthorQuery());
-//        System.out.println("- - - - - - - - - - - - - - - - - - -");
-//        System.out.println(QS.getDeckBasicInfoByIdQuery());
-//        System.out.println("- - - - - - - - - - - - - - - - - - -");
-//        System.out.println(QS.getDeckSettingCardsPerDayQuery());
-//        System.out.println("- - - - - - - - - - - - - - - - - - -");
-//        System.out.println(QS.getDeckNameAndLanguageByIdQuery());
-//        System.out.println("- - - - - - - - - - - - - - - - - - -");
-//        System.out.println(QS.getLearningProgressCardsToReviewNext7DaysQuery());
-//        System.out.println("- - - - - - - - - - - - - - - - - - -");
-//        System.out.println(QS.getCardBasicInfoByIdQuery());
-//        System.out.println("- - - - - - - - - - - - - - - - - - -");
-//        System.out.println(QS.getCardCardIdsByDeckIdQuery());
-//        System.out.println("- - - - - - - - - - - - - - - - - - -");
-//        System.out.println(QS.getCardSelectAllQuery());
-//        System.out.println("- - - - - - - - - - - - - - - - - - -");
-//        System.out.println(QS.getLearningProgressCardsToReviewTodayQuery());
-//        System.out.println("- - - - - - - - - - - - - - - - - - -");
-//        System.out.println(QS.getUserAccountThemeQuery());
-//        System.out.println("- - - - - - - - - - - - - - - - - - -");
-//        System.out.println(QS.getUserAccountThemeQuery());
-//        System.out.println("- - - - - - - - - - - - - - - - - - -");
-//        System.out.println(QS.getUserAccountUpdateQuery());
-//        System.out.println("- - - - - - - - - - - - - - - - - - -");
-//        System.out.println(QS.getDeckSettingDeleteByCompositeIdQuery());
-//        System.out.println("- - - - - - - - - - - - - - - - - - -");
-//        System.out.println(QS.getDeckBasicInfoByIdQuery());
-//        System.out.println("- - - - - - - - - - - - - - - - - - -");
-//        System.out.println(QS.getUserAccountPasswordQuery());
-//        System.out.println("- - - - - - - - - - - - - - - - - - -");
-//        System.out.println(QS.getUserAccountDeleteByIdQuery());

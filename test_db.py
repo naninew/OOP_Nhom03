@@ -25,7 +25,11 @@ def test_db():
 from py4j.java_gateway import JavaGateway, GatewayParameters
 
 gateway = JavaGateway(gateway_parameters=GatewayParameters(port=25333))
-A = gateway.entry_point.SayHello()
+A = "???"
+try:
+    A = gateway.entry_point.SayHello("Ma Ngoc Thang")
+except:
+    print("Error when connecting with database")
 print("-------")
 print(A)
 print("-------")
