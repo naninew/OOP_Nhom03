@@ -11,14 +11,6 @@ def Ask_AI_tab():
         label="Ask AI something",
         placeholder="your prompt",
     ).classes("w-full")
-    # on_change=lambda e: result_email.set_text(
-    #     "you typed: " + e.value
-    # ),
-    # validation={"Input too long": lambda value: len(value) < 30},
-    # ).on(
-    #     "keydown.enter",
-    #     lambda: UpdateAI_Answer(AI_Answer, UserPrompt.value),
-    # )  # .classes("items-center")
     ui.button(
         "Ask AI",
         on_click=lambda: UpdateAI_Answer(AI_Answer, UserPrompt.value),

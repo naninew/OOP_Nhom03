@@ -2,13 +2,12 @@ from nicegui import app as nicegui_app, ui
 from Database_controller import get_CardIdList, get_CardDetail, get_DeckDetail
 
 
-def ToggleCard(ShowFront):
-    if ShowFront.text == "Front":
-        ShowFront.text = "Back"
-    else:
-        ShowFront.text = "Front"
-    # Info[0] = CardDetail[ShowFront.text]
-    # print(Info[0])
+def CardSettingDialog():
+    with ui.dialog() as dialog, ui.card():
+        ui.label("Card setting")
+        ui.button("Apply")
+        ui.button("Close", on_click=dialog.close)
+    dialog.open()
 
 
 @ui.refreshable
@@ -22,9 +21,9 @@ def ShowCardDetail(CurrentCardId, ShowFace):
 def RouteCard(CurrentCardIndex, MaxIndex, step, ShowFace):
     if 0 <= CurrentCardIndex[0] + step <= MaxIndex:
         CurrentCardIndex[0] += step
-        ShowFace.text = "Back"
-        ShowFace.text = "Front"
-        print(CurrentCardIndex[0])
+        ShowFace.text = "Back"  # Do not touch this
+        ShowFace.text = "Front"  # Do not touch this
+        # print(CurrentCardIndex[0])
 
 
 def ToggleCard(ShowFace):
@@ -89,3 +88,4 @@ def Card_tab(CurrentDeckId):
                         CurrentCardIndex, len(CardList) - 1, 1, ShowFace
                     ),
                 )
+            ui.button("Card setting", on_click=lambda: CardSettingDialog())

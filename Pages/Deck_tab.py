@@ -3,11 +3,19 @@ from Database_controller import get_DeckIdList, get_DeckDetail
 from Pages.Card_tab import Card_tab
 
 
+def DeckSettingDialog():
+    with ui.dialog() as dialog, ui.card():
+        ui.label("Deck setting")
+        ui.button("Apply")
+        ui.button("Close", on_click=dialog.close)
+    dialog.open()
+
+
 def UseThisDeck(deckId, tabs, CurrentDeckId):
     CurrentDeckId[0] = deckId
     Card_tab.refresh()
     tabs.set_value("My Cards")
-    print("Change to {}".format(deckId))
+    # print("Change to {}".format(deckId))
 
 
 def DeckCard(deckId, tabs, CurrentDeckId):
@@ -22,6 +30,7 @@ def DeckCard(deckId, tabs, CurrentDeckId):
                 "Use this deck",
                 on_click=lambda: UseThisDeck(deckId, tabs, CurrentDeckId),
             )
+        ui.button("Deck setting", on_click=lambda: DeckSettingDialog())
         # ui.button("button {}".format(i))
         # ui.label("label {}".format(i))
 

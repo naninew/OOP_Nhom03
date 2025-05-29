@@ -20,4 +20,12 @@ def test_db():
     conn.close()
 
 
-test_db()
+# test_db()
+# ---------------------------------------------------
+from py4j.java_gateway import JavaGateway, GatewayParameters
+
+gateway = JavaGateway(gateway_parameters=GatewayParameters(port=25333))
+A = gateway.entry_point.SayHello()
+print("-------")
+print(A)
+print("-------")

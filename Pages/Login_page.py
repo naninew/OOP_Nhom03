@@ -28,53 +28,32 @@ def try_login(
         ui.notify("Wrong username or password", color="negative")
 
 
+def try_register():
+    pass
+
+
 def Login_tab(redirect_to):
     with ui.row().classes("w-full items-center"):
         ui.space()
         with ui.card().classes("w-1/2 items-center"):
             ui.label("Login")
-            user_email_login = (
-                ui.input(
-                    label="Email",
-                    placeholder="your email",
-                    # on_change=lambda e: result_email.set_text(
-                    #     "you typed: " + e.value
-                    # ),
-                    validation={"Input too long": lambda value: len(value) < 30},
-                ).on(
-                    "keydown.enter",
-                    lambda: try_login(user_email_login, password_login, redirect_to),
-                )
+            user_email_login = ui.input(
+                label="Email",
+                placeholder="your email",
+                validation={"Input too long": lambda value: len(value) < 30},
             ).classes("w-1/2 items-center")
-
-            result_email = ui.label()
-
-            password_login = (
-                ui.input(
-                    label="Password",
-                    placeholder="your password",
-                    # on_change=lambda e: result_password.set_text(
-                    #     "you typed: " + e.value
-                    # ),
-                    validation={"Input too long": lambda value: len(value) < 30},
-                    password=True,
-                    password_toggle_button=True,
-                ).on(
-                    "keydown.enter",
-                    lambda: try_login(user_email_login, password_login, redirect_to),
-                )
+            password_login = ui.input(
+                label="Password",
+                placeholder="your password",
+                password=True,
+                password_toggle_button=True,
             ).classes("w-1/2 items-center")
-            result_password = ui.label()
-            # ui.button(
-            #     "Login", on_click=lambda: ui.label("Login success")
-            # ).classes("w-1/2 items-center")
             ui.button(
                 "Login",
                 on_click=lambda: try_login(
                     user_email_login, password_login, redirect_to
                 ),
             ).classes("w-1/2 items-center")
-            # ui.timer(1.0, lambda: ui.label("Tick!"), once=True)
         ui.space()
 
 
@@ -86,51 +65,36 @@ def Register_tab():
             user_email = ui.input(
                 label="Email",
                 placeholder="your email",
-                on_change=lambda e: result_email.set_text("you typed: " + e.value),
-                validation={"Input too long": lambda value: len(value) < 20},
+                # validation={"Input too long": lambda value: len(value) < 20},
             ).classes("w-1/2 items-center")
-            result_email = ui.label()
 
             password1 = ui.input(
                 label="Password",
                 placeholder="your password",
-                on_change=lambda e: result_password.set_text("you typed: " + e.value),
-                validation={"Input too long": lambda value: len(value) < 20},
                 password=True,
                 password_toggle_button=True,
             ).classes("w-1/2 items-center")
-            result_password = ui.label()
 
             password2 = ui.input(
                 label="Confirm password",
                 placeholder="your password",
-                on_change=lambda e: result_confirm_password.set_text(
-                    "you typed: " + e.value
-                ),
-                validation={"Input too long": lambda value: len(value) < 20},
                 password=True,
                 password_toggle_button=True,
             ).classes("w-1/2 items-center")
-            result_confirm_password = ui.label()
 
             ui.button(
                 "Register", on_click=lambda: ui.label("Register Success!")
             ).classes("w-1/2 items-center")
-            # ui.timer(1.0, lambda: ui.label("Tick!"), once=True)
         ui.space()
 
 
 def Login_page(redirect_to: str = "/home") -> Optional[RedirectResponse]:
-
     if nicegui_app.storage.user.get("authenticated", False):
         return RedirectResponse("/home")
-
     Menu_bar()
-
     with ui.tabs().classes("w-full") as tabs:
         Login = ui.tab("Login")
         Register = ui.tab("Register")
-
     with ui.tab_panels(tabs, value=Login).classes("w-full"):
         with ui.tab_panel(Login):
             Login_tab(redirect_to)
