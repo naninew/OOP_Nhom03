@@ -26,7 +26,7 @@ public class Deck_Tag extends BaseTable implements InternalQuery{
                 .where(condition.multiCondition(
                         condition.whereCondition(this.deck_id.toString(),operator.Equal(),placeholder),
                         operator.And(),
-                        condition.whereCondition(this.tag_id.toString(),operator.Equal(),placeholder)));
+                        condition.whereCondition(this.tag,operator.Equal(),placeholder)));
     }
 
     @Override
@@ -40,7 +40,7 @@ public class Deck_Tag extends BaseTable implements InternalQuery{
 
     @Override
     public Query insertDetail() {
-        return query.insert(this,this.deck_id.toString(),this.tag);
+        return query.insert(this,this.deck_id.toInsert(),this.tag);
     }
 
 //    @Override

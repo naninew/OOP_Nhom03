@@ -1,7 +1,7 @@
 package Query_Builder;
 
 public class Operator {
-    private String operator;
+    private final String operator;
     public Operator(String op){
         this.operator=op;
     }
@@ -29,5 +29,8 @@ public class Operator {
     }
     public Operator Or(){
         return new Operator(" OR ");
+    }
+    public Operator IsNull(){
+        return new Operator(" IS NULL ");
     }
 }

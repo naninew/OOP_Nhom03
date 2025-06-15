@@ -33,7 +33,7 @@ public class Deck extends BaseTable implements InternalQuery{
 
     @Override
     public Query insertDetail() {
-        return query.insert(this,this.author_id.toString(),this.deck_name,this.isPublic,this.back_lang);
+        return query.insert(this,this.author_id.toInsert(),this.deck_name,this.isPublic,this.back_lang);
     }
 
 //    @Override

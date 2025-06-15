@@ -17,6 +17,14 @@ public class Query {
 
         return new TempTable(table1.toString() + " JOIN " + table2.toString() + " ON " + con.toString());
     }
+    public BaseTable leftJoin(BaseTable table1,BaseTable table2,Condition con){
+
+        return new TempTable(table1.toString() + " LEFT JOIN " + table2.toString() + " ON " + con.toString());
+    }
+    public BaseTable rightJoin(BaseTable table1,BaseTable table2,Condition con){
+
+        return new TempTable(table1.toString() + " RIGHT JOIN " + table2.toString() + " ON " + con.toString());
+    }
 
     protected String setAllColumns(String... columns){
         StringBuilder Out= new StringBuilder();
@@ -34,7 +42,7 @@ public class Query {
     public String max(String col){
         return "MAX("+col+")";
     }
-    public Query OrderBy(Boolean ASC,String column){
+    public Query orderBy(Boolean ASC,String column){
         if (ASC){
             return new Query(this.query+ " ORDER BY "+column+" ASC");
         }

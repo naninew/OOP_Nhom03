@@ -33,7 +33,7 @@ public class Card extends BaseTable implements InternalQuery{
 
     @Override
     public Query insertDetail() {
-        return query.insert(this,this.deck_id.toString(),this.front,this.back);
+        return query.insert(this,this.deck_id.toInsert(),this.front,this.back);
     }
 
 //    @Override

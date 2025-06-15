@@ -2,7 +2,14 @@ from nicegui import app as nicegui_app, ui
 from typing import Optional
 from fastapi.responses import RedirectResponse
 from Pages.Menu_bar import Menu_bar
-from Database_controller import get_UserPassword, get_UserId
+from Database_controller import (
+    get_UserPassword,
+    get_UserId,
+    get_AuthorName,
+    get_UserDetailById,
+)
+import psycopg2
+import ProtectedData
 
 # in reality users passwords would obviously need to be hashed
 passwords = {"user1": "pass1", "user2": "pass2"}
@@ -13,15 +20,21 @@ def try_login(
     user_email_login, password_login, redirect_to
 ) -> None:  # local function to avoid passing username and password as arguments
     # print(user_email_login, password_login)
-    if password_login.value == get_UserPassword(
-        user_email_login.value
+    CheckPassword = get_UserPassword(user_email_login.value)
+    if (
+        password_login.value == CheckPassword
     ):  # passwords.get(user_email_login.value) ==password_login.value:
         nicegui_app.storage.user.update(
             {
                 "userEmail": user_email_login.value,
                 "authenticated": True,
                 "userId": get_UserId(user_email_login.value),
+                "password": CheckPassword,
+                "learning_progress": dict(),
             }
+        )
+        nicegui_app.storage.user.update(
+            get_UserDetailById(nicegui_app.storage.user.get("userId"))
         )
         ui.navigate.to(redirect_to)  # go back to where the user wanted to go
     else:
@@ -88,7 +101,9 @@ def Register_tab():
         ui.space()
 
 
+@ui.page("/login")
 def Login_page(redirect_to: str = "/home") -> Optional[RedirectResponse]:
+
     if nicegui_app.storage.user.get("authenticated", False):
         return RedirectResponse("/home")
     Menu_bar()

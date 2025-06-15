@@ -13,4 +13,8 @@ public class Key{
     public String toString(){
         return this.parent_table+"."+this.name;
     }
+
+    public String toInsert(){
+        return this.name;
+    }
 }
