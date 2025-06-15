@@ -15,6 +15,7 @@ def FreePrompt(Prompt):
         model="gemini-2.0-flash",
         contents=Prompt,
     )
+    print("--- Done prompt ---")
     return response.text
 
 

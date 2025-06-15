@@ -1,6 +1,26 @@
 # from mysqlx import Row
 import psycopg2
 import ProtectedData
+from py4j.java_gateway import JavaGateway, GatewayParameters
+from LLM_API import FreePrompt
+from nicegui import app as nicegui_app
+from bs4 import BeautifulSoup
+from markdown import markdown
+
+
+def GetGateway():
+    return JavaGateway(gateway_parameters=GatewayParameters(port=25333))
+
+
+def toString(s: str):
+    return "'{}'".format(s)
+
+
+def checkedString(back: str):
+    # html = markdown(back)
+    # back = "".join(BeautifulSoup(html, features="html.parser").findAll(text=True))
+    back = "''".join(back.split("'"))
+    return toString(back)
 
 
 def RunQuery(query: str):
@@ -12,115 +32,416 @@ def RunQuery(query: str):
         host=DB_info["DB_HOST"],
         port=DB_info["DB_PORT"],
     )
-    print("Connected successfully")
+    print("Connected successfully---")
+    # conn = nicegui_app.storage.general.get("db_conn")
+    # print(type(conn), "<----")
+    print("->{}<-".format(query))
+    print("----------------------")
     cur = conn.cursor()
-    cur.execute(query)
-    rows = cur.fetchall()
-    print(rows)
-    # for data in rows:
-    #     print(data)
-    #     print("\n----------------\n")
-    conn.close()
-    return rows
+    stage = cur.execute(query)
+    try:
+        rows = cur.fetchall()
+        print(rows)
+    except:
+        rows = "-No results-"
+        # print("Stage:", stage)
+        # input()
+    finally:
+        cur.close()
+        conn.commit()
+        conn.close()
+        return rows
 
 
 def get_UserPassword(email: str):
-    rows = RunQuery(
-        """SELECT password 
-            FROM user_account 
-            WHERE email='{}'""".format(
-            email
-        )
-    )
+    gateway = GetGateway()
+    rows = RunQuery(gateway.entry_point.get_UserPassword().format(toString(email)))
     if len(rows) == 0:
         return None
     return rows[0][0]
 
 
 def get_UserId(email: str):
-    rows = RunQuery(
-        """SELECT user_id 
-            FROM user_account 
-            WHERE email='{}'""".format(
-            email
-        )
-    )
+    gateway = GetGateway()
+    rows = RunQuery(gateway.entry_point.get_UserId().format(toString(email)))
     if len(rows) == 0:
         return None
     return rows[0][0]
 
 
 def get_AuthorName(userId: str):
-    rows = RunQuery(
-        """SELECT user_name 
-            FROM user_account 
-            WHERE user_id='{}'""".format(
-            userId
-        )
-    )
+    gateway = GetGateway()
+    rows = RunQuery(gateway.entry_point.get_AuthorName().format(userId))
     if len(rows) == 0:
         return "Unknown author"
     return rows[0][0]
 
 
 def get_DeckIdList(userId: str):
-    rows = RunQuery(
-        """SELECT deck_id 
-            FROM deck 
-            WHERE author_id='{}' OR public=true""".format(
-            userId
-        )
-    )
+    gateway = GetGateway()
+    rows = RunQuery(gateway.entry_point.get_DeckIdList().format(userId))
     if len(rows) == 0:
         return None
     return list(i[0] for i in rows)
 
 
 def get_CardIdList(deckId: str):
-    rows = RunQuery(
-        """SELECT card_id      
-        FROM card 
-        WHERE deck_id='{}'""".format(
-            deckId
-        )
-    )
+    gateway = GetGateway()
+    rows = RunQuery(gateway.entry_point.get_CardIdList().format(deckId))
     if len(rows) == 0:
         return None
     return list(i[0] for i in rows)
 
 
-def get_DeckDetail(deckId: str):
-    rows = RunQuery(
-        """SELECT deck_name,author_id,public,back_lang 
-            FROM deck 
-            WHERE deck_id='{}'""".format(
-            deckId
-        )
-    )
+def get_DeckDetail(deckId: str, userId: str):
+    gateway = GetGateway()
+    rows = RunQuery(gateway.entry_point.get_DeckDetail().format(deckId))
     if len(rows) == 0:
         return None
     Output = dict()
-    Output["BackLanguage"] = rows[0][3]
+    Output["BackLanguage"] = rows[0][2]
     Output["Title"] = rows[0][0]
-    Output["ViewType"] = "public" if rows[0][2] else "private"
-    Output["Author"] = get_AuthorName(rows[0][1])
+    Output["ViewType"] = "public" if rows[0][1] else "private"
+    Output["Author"] = get_AuthorName(rows[0][3])
+    Output["AuthorId"] = rows[0][3]
+    Output["Tag"] = get_DeckTagByDeckId(deckId)
+    Output["deckId"] = deckId
+    Output.update(get_CustomDeckInfoByDeckIdAndUserId(deckId, userId))
     return Output
 
 
 def get_CardDetail(cardId: str):
-    rows = RunQuery(
-        """SELECT front,back 
-            FROM card
-            WHERE card_id='{}'""".format(
-            cardId
-        )
-    )
+    gateway = GetGateway()
+    rows = RunQuery(gateway.entry_point.get_CardDetail().format(cardId))
     if len(rows) == 0:
         return None
     Output = dict()
     Output["Front"] = rows[0][0]
     Output["Back"] = rows[0][1]
     return Output
+
+
+def update_CardBackByCardId(back: str, cardId: str):
+    back = checkedString(back)
+    # print("--- BACK ---")
+    # print(back)
+    # print("--- END BACK ---")
+    gateway = GetGateway()
+    RunQuery(gateway.entry_point.update_CardBackByCardId().format(back, cardId))
+    print("--- UPDATE SUCCESSFULLY ---")
+
+
+def get_CardTagByCardId(cardId: str):
+    gateway = GetGateway()
+    rows = RunQuery(gateway.entry_point.get_CardTagByCardId().format(cardId))
+    Tags = [i[0] for i in rows]
+    if len(Tags) == 0:
+        Tags = ["no special tag"]
+    return Tags
+
+
+def get_DeckTagByDeckId(deckId: str):
+    gateway = GetGateway()
+    rows = RunQuery(gateway.entry_point.get_DeckTagByDeckId().format(deckId))
+    Tags = [i[0] for i in rows]
+    if len(Tags) == 0:
+        Tags = ["no special tag"]
+    return Tags
+
+
+def get_BackCardPrompt(tag: str, front: str, responseLanguage: str):
+    gateway = GetGateway()
+    try:
+        return gateway.entry_point.get_BackCardPrompt(tag, front, responseLanguage)
+    except:
+        return None
+
+
+def get_BackCardAIGenerated(tag: str, front: str, responseLanguage: str):
+    try:
+        Prompt = get_BackCardPrompt(tag, front, responseLanguage)
+    except:
+        return ""
+    back = FreePrompt(Prompt)
+    return back
+
+
+def get_CardIdBackNull(deckId: str):
+    gateway = GetGateway()
+    rows = RunQuery(gateway.entry_point.get_CardIdBackNull().format(deckId))
+    return list(i[0] for i in rows)
+
+
+def get_CardFrontByCardId(cardId: str):
+    gateway = GetGateway()
+    rows = RunQuery(gateway.entry_point.get_CardFrontByCardId().format(cardId))
+    return rows[0][0]
+
+
+def get_CardIdHavingReviewDateLessThanNowByDeckId(deckId: str):
+    gateway = GetGateway()
+    rows = RunQuery(
+        gateway.entry_point.get_CardIdHavingReviewDateLessThanNowByDeckId().format(
+            deckId
+        )
+    )
+    return list(i[0] for i in rows)
+
+
+def get_CardIdNotHavingReviewDateByDeckId(deckId: str):
+    gateway = GetGateway()
+    rows = RunQuery(
+        gateway.entry_point.get_CardIdNotHavingReviewDateByDeckId().format(deckId)
+    )
+    return list(i[0] for i in rows)
+
+
+def get_CardIdHavingReviewDateGreaterThanNowByDeckId(deckId: str):
+    gateway = GetGateway()
+    rows = RunQuery(
+        gateway.entry_point.get_CardIdHavingReviewDateGreaterThanNowByDeckId().format(
+            deckId
+        )
+    )
+    return list(i[0] for i in rows)
+
+
+def get_CustomDeckInfoByDeckIdAndUserId(deckId: str, userId: str):
+    gateway = GetGateway()
+    rows = RunQuery(
+        gateway.entry_point.get_CustomDeckInfoByDeckIdAndUserId().format(deckId, userId)
+    )
+    Data = {"learning_pace": 5, "card_per_day": 5}
+    if len(rows) > 0:
+        Data["learning_pace"] = int(rows[0][0])
+        Data["card_per_day"] = int(rows[0][1])
+    else:
+        insert_CustomDeckInfoByDeckIdAndUserId(deckId, userId, 5, 5)
+    return Data
+
+
+def update_CustomDeckInfoByDeckIdAndUserId(
+    deckId: str, userId: str, learning_pace: int, card_per_day: int
+):
+    gateway = GetGateway()
+    rows = RunQuery(
+        gateway.entry_point.update_CustomDeckInfoByDeckIdAndUserId().format(
+            learning_pace, card_per_day, deckId, userId
+        )
+    )
+
+
+def insert_CustomDeckInfoByDeckIdAndUserId(
+    deckId: str, userId: str, learning_pace: int, card_per_day: int
+):
+    gateway = GetGateway()
+    rows = RunQuery(
+        gateway.entry_point.insert_CustomDeckInfoByDeckIdAndUserId().format(
+            learning_pace, card_per_day, deckId, userId
+        )
+    )
+
+
+def get_UserDetailById(userId: str):
+    gateway = GetGateway()
+    rows = RunQuery(gateway.entry_point.get_UserDetailById().format(userId))
+    Data = dict()
+    Data["accountType"] = rows[0][0]
+    Data["theme"] = rows[0][1]
+    Data["userName"] = rows[0][2]
+    return Data
+
+
+def update_UserDetailById(userId: str, theme: str, useName: str):
+    gateway = GetGateway()
+    rows = RunQuery(
+        gateway.entry_point.update_UserDetailById().format(
+            toString(theme), toString(useName), userId
+        )
+    )
+
+
+def get_ConfidentByCardIdAndUserId(cardId: str, userId: str):
+    gateway = GetGateway()
+    rows = RunQuery(
+        gateway.entry_point.get_ConfidentByCardIdAndUserId().format(cardId, userId)
+    )
+    if len(rows) == 0:
+        return None
+    return int(rows[0][0])
+
+
+def insert_LearningProgress(cardId: str, userId: str):
+    gateway = GetGateway()
+    rows = RunQuery(
+        gateway.entry_point.insert_LearningProgress().format(cardId, userId)
+    )
+
+
+def update_LearningProgress(cardId: str, userId: str, confident: int):
+    Step = (
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        14,
+        15,
+        16,
+        18,
+        19,
+        21,
+        22,
+        24,
+        26,
+        27,
+        29,
+        31,
+        33,
+        35,
+        37,
+        39,
+        41,
+        44,
+        46,
+        48,
+        51,
+        54,
+        56,
+        59,
+        62,
+        65,
+        68,
+        71,
+        75,
+        78,
+        82,
+        85,
+        89,
+        93,
+        97,
+        102,
+        106,
+        111,
+        115,
+        120,
+        125,
+        130,
+        136,
+        141,
+        147,
+        153,
+        160,
+        166,
+        173,
+        180,
+        187,
+        194,
+        202,
+        210,
+        218,
+        226,
+        235,
+        244,
+        254,
+        263,
+        273,
+        284,
+        295,
+        306,
+        317,
+        329,
+        342,
+        354,
+        368,
+        381,
+        396,
+        410,
+        426,
+        441,
+        458,
+        475,
+        492,
+        510,
+        529,
+        548,
+        568,
+        589,
+        611,
+        633,
+        656,
+        680,
+        704,
+        730,
+    )
+    gateway = GetGateway()
+    rows = RunQuery(
+        gateway.entry_point.update_LearningProgress().format(
+            confident, "review_date+{}".format(Step[confident]), cardId, userId
+        )
+    )
+
+
+def insert_Deck(authorId: str, deckName: str, isPublic: str, backLang: str):
+    gateway = GetGateway()
+    if isPublic == "public":
+        isPublic = "true"
+    else:
+        isPublic = "false"
+    rows = RunQuery(
+        gateway.entry_point.insert_Deck().format(
+            authorId, toString(deckName), isPublic, toString(backLang)
+        )
+    )
+
+
+def update_DeckByDeckId(deckId: str, deckName: str, isPublic: str, backLang: str):
+    gateway = GetGateway()
+    if isPublic == "public":
+        isPublic = "true"
+    else:
+        isPublic = "false"
+    rows = RunQuery(
+        gateway.entry_point.update_Deck().format(
+            toString(deckName), isPublic, toString(backLang), deckId
+        )
+    )
+
+
+def update_DeckSetting(deckId: str, userId: str, learning_pace: str, card_per_day: str):
+    gateway = GetGateway()
+    rows = RunQuery(
+        gateway.entry_point.update_DeckSetting().format(
+            learning_pace, card_per_day, deckId, userId
+        )
+    )
+
+
+def delete_DeckTag(deckId: str, tag: str):
+    gateway = GetGateway()
+    rows = RunQuery(gateway.entry_point.delete_DeckTag().format(deckId, toString(tag)))
+
+
+def insert_DeckTag(deckId: str, tag: str):
+    gateway = GetGateway()
+    rows = RunQuery(gateway.entry_point.insert_DeckTag().format(deckId, toString(tag)))
+
+
+def insert_Card(deckId: str, Front: str, Back: str):
+    gateway = GetGateway()
+    rows = RunQuery(
+        gateway.entry_point.insert_Card().format(
+            deckId, toString(Front), toString(Back)
+        )
+    )
 
 
 # ---------------------------------------------------------------------------------

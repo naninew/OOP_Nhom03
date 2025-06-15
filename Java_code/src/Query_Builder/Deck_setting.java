@@ -42,7 +42,7 @@ public class Deck_setting extends BaseTable implements InternalQuery{
 
     @Override
     public Query insertDetail() {
-        return query.insert(this,this.user_id.toString(),this.learning_pace,this.card_per_day);
+        return query.insert(this,this.user_id.toInsert(),this.learning_pace,this.card_per_day);
     }
 
 //    @Override

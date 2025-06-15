@@ -4,6 +4,7 @@ from LLM_API import FreePrompt
 
 async def UpdateAI_Answer(AI_Answer, Prompt):
     AI_Answer.text = await run.io_bound(FreePrompt, Prompt)
+    ui.notify("Received AI answer", type="positive")
 
 
 def Ask_AI_tab():

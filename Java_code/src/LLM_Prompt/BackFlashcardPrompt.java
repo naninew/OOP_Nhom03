@@ -8,25 +8,23 @@ public class BackFlashcardPrompt {
     private static boolean isInvalid(String str) {
         return str == null || str.trim().isEmpty();
     }
-    public static String prompt(String topic, String term, String responseLanguage) {
-        if (isInvalid(topic)) {
+
+    public String prompt(String tag, String front, String responseLanguage) {
+        // combine all tags into a single string, in the form of "tag1, tag2, tag3,..."
+        if (isInvalid(tag)) {
             throw new IllegalArgumentException("Topic must not be null, empty, or blank.");
-        }
-        if (isInvalid(term)) {
-            throw new IllegalArgumentException("Term must not be null, empty, or blank.");
-        }
-        if (isInvalid(responseLanguage)) {
-            throw new IllegalArgumentException("Response language must not be null, empty, or blank.");
         }
 
         return String.format(
-                "Provided that I am a learner of %s dealing with flashcards. " +
-                        "I want to write a flashcard's back face from its front face, %s. " +
+                "Provided that I am a learner dealing with flashcards. " +
+                        "I want to write a flashcard's back face from its front face, %s, " +
+                        "and its tags: %s (representing language, field of study, type, etc.). " +
                         "Give me detailed information about anything I need to learn about %s, " +
                         "including a wide range of examples that cover its various use cases. " +
                         "Answer strictly in %s. Your output will be threw fully into the flashcard, " +
-                        "so please do not start or end with any irrelevant sentences.",
-                topic.trim(), term.trim(), term.trim(), responseLanguage.trim()
+                        "so please do not start or end with any irrelevant sentences. " +
+                        "Start your response exactly with what is on the front face.",
+                front.trim(), tag.trim(), front.trim(), responseLanguage.trim()
         );
     }
 
