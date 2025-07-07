@@ -286,11 +286,64 @@ public class Main {
     public String update_DeckSetting(){
         return deck_setting.updateDetailByKey().toString();
     }
+    public String update_Card(){
+        return card.updateDetailByKey().toString();
+    }
     public String delete_DeckTag(){
         return deck_tag.deleteByKey().toString();
     }
     public String insert_DeckTag(){
         return deck_tag.insertDetail().toString();
+    }
+    public String insert_CardTag(){
+        return card_tag.insertDetail().toString();
+    }
+    public String delete_CardTag(){
+        return card_tag.deleteByKey().toString();
+    }
+    public String delete_Deck(){
+        return deck.deleteByKey().toString();
+    }
+    public String delete_CardOfDeck(){
+        return query.delete(card).where(
+                condition.whereCondition(card.deck_id.toString(),operator.Equal(),placeholder)).toString();
+    }
+    public String delete_DeckSetting(){
+        return query.delete(deck_setting).where(
+                condition.whereCondition(deck_setting.deck_id.toString(),operator.Equal(),placeholder)
+        ).toString();
+    }
+    public String delete_Card(){
+        return card.deleteByKey().toString();
+    }
+    public String delete_AllCardTag(){
+        return query.delete(card_tag).where(
+                condition.whereCondition(
+                        card_tag.card_id.toString(),operator.Equal(),placeholder)).toString();
+    }
+    public String delete_AllDeckTag(){
+        return query.delete(deck_tag).where(
+                condition.whereCondition(
+                        deck_tag.deck_id.toString(),operator.Equal(),placeholder)).toString();
+    }
+    public String delete_LearningProgress(){
+        return query.delete(learning_progress).where(
+                        condition.whereCondition(learning_progress.card_id.toString(),operator.Equal(),placeholder)
+        ).toString();
+    }
+    public String insert_User(){
+        return query.insert(user_account,user_account.type,
+                user_account.theme,user_account.password,
+                user_account.user_name,user_account.email).toString();
+    }
+    public String update_UserEmail(){
+        return query.update(user_account,user_account.email)
+                .where(condition.whereCondition(
+                        user_account.user_id.toString(),operator.Equal(),placeholder)).toString();
+    }
+    public String update_UserPassword(){
+        return query.update(user_account,user_account.password).where(condition.whereCondition(
+                user_account.user_id.toString(),operator.Equal(),placeholder)).toString();
     }
     public static void main(String[] args) {
         GatewayServer gatewayServer =new GatewayServer(new Main(),25333);

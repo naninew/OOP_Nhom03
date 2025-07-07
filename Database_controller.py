@@ -55,7 +55,7 @@ def RunQuery(query: str):
 
 def get_UserPassword(email: str):
     gateway = GetGateway()
-    rows = RunQuery(gateway.entry_point.get_UserPassword().format(toString(email)))
+    rows = RunQuery(gateway.entry_point.get_UserPassword().format(checkedString(email)))
     if len(rows) == 0:
         return None
     return rows[0][0]
@@ -63,7 +63,7 @@ def get_UserPassword(email: str):
 
 def get_UserId(email: str):
     gateway = GetGateway()
-    rows = RunQuery(gateway.entry_point.get_UserId().format(toString(email)))
+    rows = RunQuery(gateway.entry_point.get_UserId().format(checkedString(email)))
     if len(rows) == 0:
         return None
     return rows[0][0]
@@ -82,7 +82,7 @@ def get_DeckIdList(userId: str):
     rows = RunQuery(gateway.entry_point.get_DeckIdList().format(userId))
     if len(rows) == 0:
         return None
-    return list(i[0] for i in rows)
+    return sorted(i[0] for i in rows)
 
 
 def get_CardIdList(deckId: str):
@@ -162,7 +162,7 @@ def get_BackCardAIGenerated(tag: str, front: str, responseLanguage: str):
         Prompt = get_BackCardPrompt(tag, front, responseLanguage)
     except:
         return ""
-    back = FreePrompt(Prompt)
+    back = "\n".join(list(filter(None, FreePrompt(Prompt).split("\n"))))
     return back
 
 
@@ -256,7 +256,7 @@ def update_UserDetailById(userId: str, theme: str, useName: str):
     gateway = GetGateway()
     rows = RunQuery(
         gateway.entry_point.update_UserDetailById().format(
-            toString(theme), toString(useName), userId
+            checkedString(theme), checkedString(useName), userId
         )
     )
 
@@ -398,9 +398,11 @@ def insert_Deck(authorId: str, deckName: str, isPublic: str, backLang: str):
         isPublic = "false"
     rows = RunQuery(
         gateway.entry_point.insert_Deck().format(
-            authorId, toString(deckName), isPublic, toString(backLang)
+            authorId, checkedString(deckName), isPublic, checkedString(backLang)
         )
+        + "RETURNING deck_id"
     )
+    return rows[0][0]
 
 
 def update_DeckByDeckId(deckId: str, deckName: str, isPublic: str, backLang: str):
@@ -411,7 +413,7 @@ def update_DeckByDeckId(deckId: str, deckName: str, isPublic: str, backLang: str
         isPublic = "false"
     rows = RunQuery(
         gateway.entry_point.update_Deck().format(
-            toString(deckName), isPublic, toString(backLang), deckId
+            checkedString(deckName), isPublic, checkedString(backLang), deckId
         )
     )
 
@@ -427,19 +429,101 @@ def update_DeckSetting(deckId: str, userId: str, learning_pace: str, card_per_da
 
 def delete_DeckTag(deckId: str, tag: str):
     gateway = GetGateway()
-    rows = RunQuery(gateway.entry_point.delete_DeckTag().format(deckId, toString(tag)))
+    rows = RunQuery(
+        gateway.entry_point.delete_DeckTag().format(deckId, checkedString(tag))
+    )
 
 
 def insert_DeckTag(deckId: str, tag: str):
     gateway = GetGateway()
-    rows = RunQuery(gateway.entry_point.insert_DeckTag().format(deckId, toString(tag)))
+    rows = RunQuery(
+        gateway.entry_point.insert_DeckTag().format(deckId, checkedString(tag))
+        + "RETURNING tag_id"
+    )
+    return rows[0][0]
 
 
 def insert_Card(deckId: str, Front: str, Back: str):
     gateway = GetGateway()
     rows = RunQuery(
         gateway.entry_point.insert_Card().format(
-            deckId, toString(Front), toString(Back)
+            deckId, checkedString(Front), checkedString(Back)
+        )
+        + "RETURNING card_id"
+    )
+    return rows[0][0]
+
+
+def insert_CardTag(cardId: str, tag: str):
+    gateway = GetGateway()
+    rows = RunQuery(
+        gateway.entry_point.insert_CardTag().format(cardId, checkedString(tag))
+    )
+    return rows[0][0]
+
+
+def delete_CardTag(cardId: str, tag: str):
+    gateway = GetGateway()
+    rows = RunQuery(
+        gateway.entry_point.delete_CardTag().format(cardId, checkedString(tag))
+    )
+
+
+def delete_DeckSetting(deckId: str):
+    gateway = GetGateway()
+    rows = RunQuery(gateway.entry_point.delete_DeckSetting().format(deckId))
+
+
+def delete_Deck(deckId: str):
+    gateway = GetGateway()
+    rows = RunQuery(gateway.entry_point.delete_Deck().format(deckId))
+
+
+def delete_Card(cardId: str):
+    gateway = GetGateway()
+    rows = RunQuery(gateway.entry_point.delete_Card().format(cardId))
+
+
+def delete_LearningProgress(cardId: str):
+    gateway = GetGateway()
+    rows = RunQuery(gateway.entry_point.delete_LearningProgress().format(cardId))
+
+
+def delete_AllCardTag(cardId: str):
+    gateway = GetGateway()
+    rows = RunQuery(gateway.entry_point.delete_AllCardTag().format(cardId))
+
+
+def delete_AllDeckTag(deckId: str):
+    gateway = GetGateway()
+    rows = RunQuery(gateway.entry_point.delete_AllDeckTag().format(deckId))
+
+
+def insert_User(type: str, theme: str, password: str, userName: str, email: str):
+    gateway = GetGateway()
+    rows = RunQuery(
+        gateway.entry_point.insert_User().format(
+            checkedString(type),
+            checkedString(theme),
+            checkedString(password),
+            checkedString(userName),
+            checkedString(email),
+        )
+    )
+
+
+def update_UserEmail(userId: str, email: str):
+    gateway = GetGateway()
+    rows = RunQuery(
+        gateway.entry_point.update_UserEmail().format(checkedString(email), userId)
+    )
+
+
+def update_UserPassword(userId: str, password: str):
+    gateway = GetGateway()
+    rows = RunQuery(
+        gateway.entry_point.update_UserPassword().format(
+            checkedString(password), userId
         )
     )
 
