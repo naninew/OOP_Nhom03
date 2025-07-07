@@ -22,7 +22,11 @@ public class Card_tag extends BaseTable implements InternalQuery{
     @Override
     public Query deleteByKey() {
         return query.delete(this)
-                .where(condition.whereCondition(this.tag_id.toString(),operator.Equal(),placeholder));
+                .where(condition.multiCondition(
+                        condition.whereCondition(this.card_id.toString(),operator.Equal(),placeholder),
+                        operator.And(),
+                        condition.whereCondition(this.tag,operator.Equal(),placeholder)
+                ));
     }
 
     @Override
@@ -33,7 +37,7 @@ public class Card_tag extends BaseTable implements InternalQuery{
 
     @Override
     public Query insertDetail() {
-        return query.insert(this,this.card_id.toString(),this.tag);
+        return query.insert(this,this.card_id.toInsert(),this.tag);
     }
 
 //    @Override

@@ -3,7 +3,8 @@ from LLM_API import FreePrompt
 
 
 async def UpdateAI_Answer(AI_Answer, Prompt):
-    AI_Answer.text = await run.io_bound(FreePrompt, Prompt)
+    # AI_Answer.text = await run.io_bound(FreePrompt, Prompt)
+    AI_Answer.set_content(await run.io_bound(FreePrompt, Prompt))
     ui.notify("Received AI answer", type="positive")
 
 
@@ -17,6 +18,9 @@ def Ask_AI_tab():
         on_click=lambda: UpdateAI_Answer(AI_Answer, UserPrompt.value),
     )
     ui.separator()
-    AI_Answer = ui.label("AI's answer").style(
-        "white-space: pre-wrap;"
-    )  # .classes("w-1/2 items-center")
+    # AI_Answer = ui.label("AI's answer").style(
+    #     "white-space: pre-wrap;"
+    # )  # .classes("w-1/2 items-center")
+    AI_Answer = ((ui.markdown("AI's answer")).style("white-space: pre-wrap;")).classes(
+        "min-w-fit min-h-fit border p-2 text-2xl"
+    )

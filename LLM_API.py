@@ -16,7 +16,7 @@ def FreePrompt(Prompt):
         contents=Prompt,
     )
     print("--- Done prompt ---")
-    return response.text
+    return "\n".join(list(filter(None, (response.text).split("\n"))))
 
 
 def CreateCardBack(Front, BackLanguage):

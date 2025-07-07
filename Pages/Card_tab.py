@@ -10,7 +10,13 @@ from Database_controller import (
     get_ConfidentByCardIdAndUserId,
     insert_LearningProgress,
     update_LearningProgress,
+    insert_CardTag,
+    delete_CardTag,
+    delete_AllCardTag,
+    delete_LearningProgress,
+    delete_Card,
 )
+from ProtectedData import getTagAllowed
 
 
 def GetCardIdByPriority():
@@ -38,37 +44,72 @@ def GetCardIdByPriority():
     return CardIdList[:Limit]
 
 
-def ApplySetting():
+def ApplySetting(CardTag, Tag, cardId: str, dialog, ShowCardTag):
+    print(CardTag, "<<<<")
+    print(Tag, "<<<<<<")
+    for tag in Tag:
+        if tag not in CardTag:
+            insert_CardTag(cardId, tag)
+            print(tag, "<----")
+    for tag in CardTag:
+        if tag not in Tag:
+            delete_CardTag(cardId, tag)
+    dialog.close()
+    ShowCardTag.refresh()
     ui.notify("Updated card setting", type="positive")
 
 
-def CardSettingDialog(
-    CardTag: list,
-):
-    ui.notification("Not working yet", type="info")
+def DeleteCard(cardId: str, settingDialog, dialog):
+    delete_AllCardTag(cardId)
+    delete_LearningProgress(cardId)
+    delete_Card(cardId)
+    dialog.close()
+    settingDialog.close()
+    ui.notification("Deleted card", type="positive")
+
+
+def DeleteCardDialog(cardId: str, settingDialog):
+    with ui.dialog() as dialog, ui.card():
+        ui.label("Do you want to delete this card?")
+        ui.button(
+            "Delete",
+            color="red",
+            on_click=lambda: DeleteCard(cardId, settingDialog, dialog),
+        )
+        ui.button("Cancel", on_click=dialog.close)
+    dialog.open()
+
+
+def CardSettingDialog(CardTag: list, cardId: str, ShowCardTag):
+    # ui.notification("Not working yet", type="info")
     with ui.dialog() as dialog, ui.card():
         ui.label("Card setting")
-        TagsAllowed = [
-            "JLPT N5",
-            "JLPT N4",
-            "JLPT N3",
-            "JLPT N2",
-            "JLPT N1",
-            "Vocabulary",
-            "Grammar",
-            "C2",
-            "C1",
-        ]
+        ui.separator()
+        TagsAllowed = getTagAllowed()
         with ui.row():
             ui.label("Card tags: ")
-            Tag = ui.select(
-                TagsAllowed,
-                multiple=True,
-                value=CardTag,
-                label="Card tags:",
-            ).props("use-chips")
+            Tag = (
+                ui.select(
+                    TagsAllowed,
+                    multiple=True,
+                    value=CardTag,
+                    label="Card tags:",
+                ).props("use-chips")
+            ).style("min-width:300px")
+        ui.separator()
+        ui.button(
+            "Delete this card",
+            color="red",
+            on_click=lambda: DeleteCardDialog(cardId, dialog),
+        )
+        ui.separator()
         with ui.row():
-            ui.button("Apply", on_click=lambda: ApplySetting())
+            ui.button(
+                "Apply setting",
+                on_click=lambda: ApplySetting(
+                    CardTag, Tag.value, cardId, dialog, ShowCardTag
+                ),
+            )
             ui.button("Cancel", on_click=dialog.close)
     dialog.open()
 
@@ -81,7 +122,19 @@ def ShowCardDetail(CurrentCardId, ShowFace):
     CardInfo = ui.label(CardDetail[ShowFace.text])
 
 
-def RouteCard(MaxIndex, step, ShowFace, Grade_button):
+@ui.refreshable
+def ShowCardTag():
+    CardList = nicegui_app.storage.user.get("CardList")
+    CardTagLabel = ui.label(
+        "Card tags: {}".format(
+            ", ".join(
+                get_CardTagByCardId(CardList[nicegui_app.storage.user.get("cardId", 0)])
+            )
+        )
+    )
+
+
+def RouteCard(MaxIndex, step, ShowFace, Grade_button, ShowCardTag):
     CurrentCardIndex = nicegui_app.storage.user.get("cardId", 0)
     if 0 <= CurrentCardIndex + step <= MaxIndex:
         CurrentCardIndex += step
@@ -93,6 +146,8 @@ def RouteCard(MaxIndex, step, ShowFace, Grade_button):
     nicegui_app.storage.user.update({"cardId": CurrentCardIndex})
     ShowFace.text = "Back"  # Do not touch this
     ShowFace.text = "Front"  # Do not touch this
+
+    ShowCardTag.refresh()
     Grade_button.set_visibility(False)
 
 
@@ -101,6 +156,7 @@ def ToggleCard(ShowFace, Grade_button):
         ShowFace.text = "Back"
     else:
         ShowFace.text = "Front"
+
     Grade_button.set_visibility(True)
 
 
@@ -149,12 +205,13 @@ def CardGradeCal(cardId: str, grade: int, Grade_button):
 
 # @ui.refreshable
 def Card_tab():
-    ui.label("This is my card tab")
     if nicegui_app.storage.user.get("deckId", None) == None:
+        ui.label("This is my card tab")
         ui.label("You haven't choose a deck yet!")
     else:
         # CardList = get_CardIdList(CurrentDeckId[0])
         CardList = GetCardIdByPriority()
+        nicegui_app.storage.user.update({"CardList": CardList})
         # CurrentCardIndex = [0]
         nicegui_app.storage.user.update({"cardId": 0})
         if len(CardList) == 0:  # CardList == None:
@@ -162,16 +219,21 @@ def Card_tab():
         else:
             # DeckDetail = get_DeckDetail(CurrentDeckId[0])
             with ui.row():
-                ui.button(
-                    "Card setting",
-                    on_click=lambda: CardSettingDialog(
-                        get_CardTagByCardId(
-                            CardList[nicegui_app.storage.user.get("cardId", 0)]
-                        )
-                    ),
-                )
-                ui.button("Delete this card")
-                ui.button("Save my progress", on_click=SaveProgress)
+                if nicegui_app.storage.user.get(
+                    "userId"
+                ) == nicegui_app.storage.user.get("AuthorId"):
+                    ui.button(
+                        "Card setting",
+                        on_click=lambda: CardSettingDialog(
+                            get_CardTagByCardId(
+                                CardList[nicegui_app.storage.user.get("cardId", 0)]
+                            ),
+                            CardList[nicegui_app.storage.user.get("cardId", 0)],
+                            ShowCardTag,
+                        ),
+                    )
+                ui.button("Save my progress", color="green", on_click=SaveProgress)
+            ui.separator()
             with ui.row():
                 ui.label("Title: {}".format(nicegui_app.storage.user.get("Title")))
                 ui.label(
@@ -212,41 +274,39 @@ def Card_tab():
                     nicegui_app.storage.user.get("cardId", 0) + 1, len(CardList)
                 ),
             )
-            ui.label(
-                "Tags: {}".format(
-                    ", ".join(
-                        get_CardTagByCardId(
-                            CardList[nicegui_app.storage.user.get("cardId", 0)]
-                        )
-                    )
-                )
-            )
+            # CardTagLabel = ui.label(
+            #     "Tags: {}".format(
+            #         ", ".join(
+            #             get_CardTagByCardId(
+            #                 CardList[nicegui_app.storage.user.get("cardId", 0)]
+            #             )
+            #         )
+            #     )
+            # )
+            ShowCardTag()
+            ui.separator()
             with ui.row():
                 ui.button(
                     "Back",
                     on_click=lambda: RouteCard(
-                        len(CardList) - 1,
-                        -1,
-                        ShowFace,
-                        Grade_button,
+                        len(CardList) - 1, -1, ShowFace, Grade_button, ShowCardTag
                     ),
                 )
                 Toggle_button = ui.button(
                     "Toggle Card",
+                    color="indigo",
                     on_click=lambda: ToggleCard(ShowFace, Grade_button),
                 )
                 ui.button(
                     "Next",
                     on_click=lambda: RouteCard(
-                        len(CardList) - 1,
-                        1,
-                        ShowFace,
-                        Grade_button,
+                        len(CardList) - 1, 1, ShowFace, Grade_button, ShowCardTag
                     ),
                 )
             with ui.row() as Grade_button:
                 ui.button(
                     "Again",
+                    color="red",
                     on_click=lambda: CardGradeCal(
                         CardList[nicegui_app.storage.user.get("cardId", 0)],
                         0,
@@ -255,6 +315,7 @@ def Card_tab():
                 )
                 ui.button(
                     "Hard",
+                    color="deep-orange",
                     on_click=lambda: CardGradeCal(
                         CardList[nicegui_app.storage.user.get("cardId", 0)],
                         2,
@@ -263,6 +324,7 @@ def Card_tab():
                 )
                 ui.button(
                     "Good",
+                    color="teal",
                     on_click=lambda: CardGradeCal(
                         CardList[nicegui_app.storage.user.get("cardId", 0)],
                         3,
@@ -271,6 +333,7 @@ def Card_tab():
                 )
                 ui.button(
                     "Easy",
+                    color="green",
                     on_click=lambda: CardGradeCal(
                         CardList[nicegui_app.storage.user.get("cardId", 0)],
                         4,

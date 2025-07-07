@@ -7,6 +7,7 @@ from Database_controller import (
     get_UserId,
     get_AuthorName,
     get_UserDetailById,
+    insert_User,
 )
 import psycopg2
 import ProtectedData
@@ -41,63 +42,104 @@ def try_login(
         ui.notify("Wrong username or password", color="negative")
 
 
-def try_register():
-    pass
+def try_register(userType: str, user_name: str, email: str, pass1: str, pass2: str):
+    if pass1 != pass2:
+        ui.notification("Wrong confirm password", type="negative")
+    elif get_UserPassword(email) is not None:
+        ui.notification(
+            "This email has been registered\nby another account", type="negative"
+        )
+    else:
+        insert_User(userType, "Light", pass1, user_name, email)
+        ui.notification("Created new account", type="positive")
 
 
 def Login_tab(redirect_to):
-    with ui.row().classes("w-full items-center"):
+    with ui.row().classes("w-full").style("min-width:300px"):
         ui.space()
-        with ui.card().classes("w-1/2 items-center"):
+        with ui.card().classes("items-center").style("min-width:300px"):
             ui.label("Login")
-            user_email_login = ui.input(
-                label="Email",
-                placeholder="your email",
-                validation={"Input too long": lambda value: len(value) < 30},
-            ).classes("w-1/2 items-center")
-            password_login = ui.input(
-                label="Password",
-                placeholder="your password",
-                password=True,
-                password_toggle_button=True,
-            ).classes("w-1/2 items-center")
+            user_email_login = (
+                ui.input(
+                    label="Email",
+                    placeholder="your email",
+                    # validation={"Input too long": lambda value: len(value) < 30},
+                ).classes("items-center")
+            ).style("min-width:300px")
+            password_login = (
+                ui.input(
+                    label="Password",
+                    placeholder="your password",
+                    password=True,
+                    password_toggle_button=True,
+                ).classes("items-center")
+            ).style("min-width:300px")
             ui.button(
                 "Login",
                 on_click=lambda: try_login(
                     user_email_login, password_login, redirect_to
                 ),
-            ).classes("w-1/2 items-center")
+            ).classes("items-center").style("min-width:300px")
         ui.space()
 
 
 def Register_tab():
-    with ui.row().classes("w-full"):
+    with ui.row().classes("w-full").style("min-width:300px"):
         ui.space()
-        with ui.card().classes("w-1/2 items-center"):
+        with ui.card().classes("items-center").style("min-width:300px"):
             ui.label("Register")
-            user_email = ui.input(
-                label="Email",
-                placeholder="your email",
-                # validation={"Input too long": lambda value: len(value) < 20},
-            ).classes("w-1/2 items-center")
+            user_name = (
+                ui.input(
+                    label="Your name",
+                    placeholder="your name",
+                    value="My name",
+                    # validation={"Input too long": lambda value: len(value) < 20},
+                ).classes("items-center")
+            ).style("min-width:300px")
 
-            password1 = ui.input(
-                label="Password",
-                placeholder="your password",
-                password=True,
-                password_toggle_button=True,
-            ).classes("w-1/2 items-center")
+            user_email = (
+                ui.input(
+                    label="Email",
+                    placeholder="your email",
+                    # validation={"Input too long": lambda value: len(value) < 20},
+                ).classes("items-center")
+            ).style("min-width:300px")
 
-            password2 = ui.input(
-                label="Confirm password",
-                placeholder="your password",
-                password=True,
-                password_toggle_button=True,
-            ).classes("w-1/2 items-center")
+            password1 = (
+                ui.input(
+                    label="Password",
+                    placeholder="your password",
+                    password=True,
+                    password_toggle_button=True,
+                ).classes("items-center")
+            ).style("min-width:300px")
 
+            password2 = (
+                ui.input(
+                    label="Confirm password",
+                    placeholder="your password",
+                    password=True,
+                    password_toggle_button=True,
+                ).classes("items-center")
+            ).style("min-width:300px")
+            Type = ["public", "premium"]
+            with ui.row():
+                ui.label("Account type: ")
+                UserType = ui.select(
+                    Type,
+                    value="public",
+                    label="Account type:",
+                ).style("min-width:150px")
             ui.button(
-                "Register", on_click=lambda: ui.label("Register Success!")
-            ).classes("w-1/2 items-center")
+                "Register",
+                on_click=lambda: try_register(
+                    UserType.value,
+                    user_name.value,
+                    user_email.value,
+                    password1.value,
+                    password2.value,
+                ),
+            ).classes("items-center").style("min-width:300px")
         ui.space()
 
 
